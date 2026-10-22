@@ -1,5 +1,16 @@
 # A GPU-gép frissítése
 
+## A repó új neve (2026. október)
+
+A repó `kzkz22/skipwise-gpu` lett (korábban `dwyt-gpu`). A GitHub a régi címről átirányít, így a régi parancsok is
+működnek. A telepített rendszeren semmi nem változik: a parancs (`dwyt-gpu`), a konténerek (`dwyt-llama`,
+`dwyt-whisper`) és a kép (`dwyt-whisper:local`) maradnak. Ha a forrás klónból van (például `/opt/dwyt-gpu`), a címét
+egyszer átírhatod, ez nem kötelező:
+
+```bash
+git -C /opt/dwyt-gpu remote set-url origin https://github.com/kzkz22/skipwise-gpu
+```
+
 A konténereket az AI-router indítja. Frissítés előtt nézd meg, fut-e épp munka (`docker ps`): futó konténert ne hozz létre újra.
 
 ## A Whisper-worker
@@ -37,7 +48,7 @@ A 2-es letöltési lista minden fájlt a `gguf/<szervezet>/<repó>/` mappába te
 ## A modelleszköz
 
 ```bash
-uv tool install --force git+https://github.com/kzkz22/dwyt-gpu
+uv tool install --force git+https://github.com/kzkz22/skipwise-gpu
 export PATH="/root/.local/bin:$PATH"   # ha az uv szerint a /root/.local/bin nincs a PATH-on (Unraidon minden újraindítás után)
 dwyt-gpu --version
 dwyt-gpu token --dir MODELLMAPPA       # 0.2.1-től: egyszer elmenti a Hugging Face-tokent a modellmappába

@@ -24,6 +24,10 @@ License: MIT.
 Worker messages that reach the user are Hungarian. Tests run the real worker with `tests/fakes` (torch,
 whisperx) first on PYTHONPATH; flag files switch fake behaviour (crash_once, gpu_fail_once, slow_once).
 
+Repository: kzkz22/skipwise-gpu (renamed from dwyt-gpu, decision 19.19). Only the repository name and links
+changed: commands, package names, folders, services, containers and images keep their dwyt names, because the
+owner's LXCs run them by those names. Never rename them without a migration.
+
 ## Conventions
 
 - The owner writes in Hungarian. User-facing docs (`README.md`, `docs/`) and any UI are Hungarian;

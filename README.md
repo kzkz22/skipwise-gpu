@@ -1,6 +1,6 @@
-# dwyt-gpu
+# skipwise-gpu
 
-A **dwyt** GPU-gépe: NVIDIA GPU-s gépre (Linux + Docker, Unraid; Windowson WSL2-vel) a llama-server és a Whisper GPU-worker konténere, a modellek mappája és egy modellletöltő parancs. A konténereket az AI-router ([dwyt-airouter](https://github.com/kzkz22/dwyt-airouter)) indítja és állítja le igény szerint, egyszerre mindig csak egyet. Így a GPU-n az LLM és a Whisper felváltva fut.
+A **Skipwise** GPU-gépe: NVIDIA GPU-s gépre (Linux + Docker, Unraid; Windowson WSL2-vel) a llama-server és a Whisper GPU-worker konténere, a modellek mappája és egy modellletöltő parancs. A konténereket az AI-router ([skipwise-airouter](https://github.com/kzkz22/skipwise-airouter)) indítja és állítja le igény szerint, egyszerre mindig csak egyet. Így a GPU-n az LLM és a Whisper felváltva fut.
 
 - **`dwyt-llama`:** a llama.cpp hivatalos `server-cuda` képe router módban. A presetek a `models.ini`-ből jönnek, amit a `dwyt-airouter generate` készít.
 - **`dwyt-whisper`:** WhisperX (large-v3 / large-v3-turbo) → wav2vec2-igazítás → pyannote-beszélőfelismerés. Egy munka egyetlen HTTP-kérés, a haladást NDJSON-sorokban küldi. CUDA-hiba után CPU-n fejezi be, a Whisper-lépés eredményét megőrzi.

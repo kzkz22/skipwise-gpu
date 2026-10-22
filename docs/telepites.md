@@ -1,6 +1,6 @@
 # A GPU-gép telepítése
 
-Ez a leírás a dwyt GPU-gépének első telepítését írja le. Ide kerül a llama-server (helyi LLM-ek) és a Whisper GPU-worker (helyi átírás beszélőkkel) konténere és a modellek. A konténereket nem ez a gép indítja, hanem az AI-router ([dwyt-airouter](https://github.com/kzkz22/dwyt-airouter)), egyszerre mindig csak egyet. A frissítés: [frissites.md](frissites.md). A terv: [dwyt-docs, 10. fejezet](https://github.com/kzkz22/dwyt-docs/blob/main/docs/terv.md).
+Ez a leírás a dwyt GPU-gépének első telepítését írja le. Ide kerül a llama-server (helyi LLM-ek) és a Whisper GPU-worker (helyi átírás beszélőkkel) konténere és a modellek. A konténereket nem ez a gép indítja, hanem az AI-router ([skipwise-airouter](https://github.com/kzkz22/skipwise-airouter)), egyszerre mindig csak egyet. A frissítés: [frissites.md](frissites.md). A terv: [dwyt-docs, 10. fejezet](https://github.com/kzkz22/dwyt-docs/blob/main/docs/terv.md).
 
 Két út van:
 
@@ -28,7 +28,7 @@ A nagybetűs részeket (`AI-ROUTER-IP`, `MODELLMAPPA`) cseréld a saját érték
 
 ```bash
 # a GPU-gépen
-git clone https://github.com/kzkz22/dwyt-gpu /opt/dwyt-gpu
+git clone https://github.com/kzkz22/skipwise-gpu /opt/dwyt-gpu
 cd /opt/dwyt-gpu
 cp whisper.env.example whisper.env && chmod 600 whisper.env
 nano whisper.env        # HF_TOKEN=hf_... (a Whisper-modellek listája és a többi maradhat)
@@ -59,7 +59,7 @@ A worker saját munkaadatai (a félbemaradt munkák folytatásához) külön Doc
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh     # ha még nincs uv
-uv tool install git+https://github.com/kzkz22/dwyt-gpu
+uv tool install git+https://github.com/kzkz22/skipwise-gpu
 dwyt-gpu --version
 ```
 
@@ -93,7 +93,7 @@ A modellmappa legyen a gyorsítótár-meghajtón, például `/mnt/cache/appdata/
 **`dwyt-whisper`:** a képet egyszer helyben kell megépíteni (Unraid terminál):
 
 ```bash
-git clone https://github.com/kzkz22/dwyt-gpu /mnt/cache/appdata/dwyt-gpu-src
+git clone https://github.com/kzkz22/skipwise-gpu /mnt/cache/appdata/dwyt-gpu-src
 docker build -t dwyt-whisper:local /mnt/cache/appdata/dwyt-gpu-src/worker
 ```
 
@@ -112,7 +112,7 @@ A modelleszköz az Unraid terminálján is fut. Az uv magával hozza a Pythont, 
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh && source /root/.local/bin/env
-uv tool install git+https://github.com/kzkz22/dwyt-gpu
+uv tool install git+https://github.com/kzkz22/skipwise-gpu
 export DWYT_MODELS_DIR=/mnt/cache/appdata/dwyt-models
 ```
 
