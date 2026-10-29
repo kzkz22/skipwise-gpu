@@ -41,7 +41,8 @@ def main(job_dir: Path) -> int:
         warnings: list[str] = []
         device = asr.choose_device(settings, warnings)
         state["device"] = device
-        checkpoint = asr.checkpoint_path(settings, job["sha256"], opts["model"], opts.get("language"))
+        checkpoint = asr.checkpoint_path(settings, job["sha256"], opts["model"], opts.get("language"),
+                                         opts.get("prompt"))
         audio = str(job_dir / "audio")
         try:
             result = asr.run(audio, opts, settings, device, checkpoint, stage)

@@ -49,6 +49,18 @@ def test_crash_is_isolated_and_the_rerun_resumes_from_the_checkpoint(worker):
     assert sum(1 for c in worker.calls() if c.startswith("transcribe")) == before  # Whisper not run again
 
 
+def test_terms_go_into_the_initial_prompt(worker):
+    """dwyt plan 19c round A: the prompt reaches WhisperX; the same audio with another prompt is transcribed again."""
+    from urllib.parse import quote
+    _, lines = transcribe(worker, "model=large-v3&language=hu&prompt=" + quote("Kovács Ödön, OKR.\x00"))
+    assert "result" in lines[-1]
+    assert "load_model large-v3 cuda float16 Kovács Ödön, OKR." in worker.calls()
+    _, lines = transcribe(worker, "model=large-v3&language=hu")
+    assert "result" in lines[-1]
+    loads = [c for c in worker.calls() if c.startswith("load_model")]
+    assert len(loads) == 2 and loads[-1].endswith("None")  # no prompt: a separate checkpoint, Whisper ran again
+
+
 def test_refusals(make_worker):
     w = make_worker(HF_TOKEN="")
     status, body = transcribe(w, "model=tiny")

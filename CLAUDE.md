@@ -6,7 +6,7 @@ diarization, NDJSON streaming with heartbeats, CUDA failure → CPU retry), mode
 model-download command driven by the airouter's `models.yaml`. Started and stopped on demand by dwyt-airouter;
 its ports must only be reachable from the AI router (no auth of its own).
 
-Status: round 2 implemented (worker port, compose file, `dwyt-gpu download|check`); not yet run on a real GPU host.
+Status: round 2 implemented (worker port, compose file, `dwyt-gpu download|check`); plan 19c round A: query param `prompt` (≤1000 printable chars) → WhisperX `asr_options.initial_prompt`, part of the ASR checkpoint key when set. Not yet run on a real GPU host.
 License: MIT.
 
 ## Layout
@@ -15,7 +15,7 @@ License: MIT.
 | --- | --- |
 | `worker/gpuworker/server.py` | Worker HTTP API: one job per streamed request (NDJSON + 10 s heartbeats), one job at a time |
 | `worker/gpuworker/job.py` | Child process per job; CUDA failure -> CPU retry with a warning |
-| `worker/gpuworker/asr.py` | WhisperX -> alignment -> diarization; ASR checkpoint keyed by audio SHA-256 + model + language |
+| `worker/gpuworker/asr.py` | WhisperX -> alignment -> diarization; ASR checkpoint keyed by audio SHA-256 + model + language (+ prompt) |
 | `worker/Dockerfile` | `whisperx==3.8.6` pinned (signatures verified against it in the old system) |
 | `compose.yaml` | `dwyt-llama` (llama.cpp server-cuda, router mode, `/models/models.ini`) and `dwyt-whisper`; create only |
 | `dwyt_gpu/download.py` | `downloads.json` (written by `dwyt-airouter generate`) -> `<dir>/gguf/<owner>/<repo>/` (version 2; version 1: flat `<dir>/gguf`), `<dir>/hf/hub`; space check; HF token from `HF_TOKEN` or `<dir>/hf/token` (0600, `dwyt-gpu token`) |

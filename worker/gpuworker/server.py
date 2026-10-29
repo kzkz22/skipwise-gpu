@@ -5,7 +5,7 @@ AI router's llama-swap starts and stops, so it only holds the GPU while llama-sw
 given it to the worker. The runner reaches it through llama-swap:  /upstream/<name>/transcribe
 
 GET  /health
-POST /transcribe?model=large-v3&language=hu&diarize=true&num_speakers=2
+POST /transcribe?model=large-v3&language=hu&diarize=true&num_speakers=2[&prompt=Kovács Ödön, OKR.]
      body: the audio (16 kHz mono FLAC from the runner; any format ffmpeg reads works)
      answer: application/x-ndjson, one JSON object per line, sent as the job goes:
         {"stage": "transcribe", "device": "cuda"}   progress, and every 10 s as a heartbeat
@@ -162,10 +162,14 @@ async def _receive(request: Request, target: Path) -> tuple[str, int, bool]:
     return digest.hexdigest(), size, too_large
 
 
+MAX_PROMPT = 1000
+
+
 @app.post("/transcribe")
 async def transcribe(request: Request, model: str, language: str | None = None,
                      diarize: bool = True, num_speakers: int | None = None,
-                     min_speakers: int | None = None, max_speakers: int | None = None):
+                     min_speakers: int | None = None, max_speakers: int | None = None,
+                     prompt: str | None = None):
     job_dir = JOBS_DIR / uuid.uuid4().hex[:12]
     job_dir.mkdir(parents=True)
     try:
@@ -185,14 +189,16 @@ async def transcribe(request: Request, model: str, language: str | None = None,
         if size == 0:
             raise HTTPException(status_code=422, detail="Nem érkezett hang.")
         language = (language or "").strip().lower() or None
+        # the user's names and technical words as Whisper's initial prompt (dwyt plan 19c round A)
+        prompt = " ".join("".join(ch for ch in (prompt or "") if ch.isprintable()).split())[:MAX_PROMPT] or None
         (job_dir / "job.json").write_text(json.dumps({
             "sha256": sha256,
             "options": {"model": model, "language": language, "diarize": diarize,
                         "num_speakers": num_speakers, "min_speakers": min_speakers,
-                        "max_speakers": max_speakers}}), encoding="utf-8")
+                        "max_speakers": max_speakers, "prompt": prompt}}), encoding="utf-8")
     except BaseException:
         shutil.rmtree(job_dir, ignore_errors=True)
         raise
-    log.info("job %s: %d bytes, model=%s language=%s diarize=%s", job_dir.name, size, model,
-             language or "auto", diarize)
+    log.info("job %s: %d bytes, model=%s language=%s diarize=%s prompt=%d chars", job_dir.name, size, model,
+             language or "auto", diarize, len(prompt or ""))
     return StreamingResponse(_run(job_dir), media_type="application/x-ndjson")

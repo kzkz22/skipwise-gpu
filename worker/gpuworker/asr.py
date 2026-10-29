@@ -38,13 +38,15 @@ def json_default(obj):
     return obj.item() if hasattr(obj, "item") else str(obj)
 
 
-def checkpoint_path(settings: Settings, audio_sha256: str, model: str, language: str | None) -> Path:
+def checkpoint_path(settings: Settings, audio_sha256: str, model: str, language: str | None,
+                    prompt: str | None = None) -> Path:
     """Where the transcription (before speaker separation) of this exact audio is kept.
 
     Whisper is the slow part and does not depend on the speaker options, so a job
     that fails later, or is repeated with another speaker count, reuses it.
     """
-    key = hashlib.sha1(json.dumps([audio_sha256, model, language]).encode()).hexdigest()[:16]
+    parts = [audio_sha256, model, language] + ([prompt] if prompt else [])  # without a prompt: the old keys
+    key = hashlib.sha1(json.dumps(parts).encode()).hexdigest()[:16]
     return Path(settings.data_dir) / "asr" / f"{key}.json"
 
 
@@ -86,9 +88,10 @@ def run(audio_path: str, opts: dict, settings: Settings, device: str, checkpoint
 
         if asr is None:
             stage("transcribe")
+            extra = {"asr_options": {"initial_prompt": opts["prompt"]}} if opts.get("prompt") else {}
             model = whisperx.load_model(model_name, device,
                                         compute_type=settings.compute_type_for(device),
-                                        language=language, threads=settings.threads())
+                                        language=language, threads=settings.threads(), **extra)
             result = model.transcribe(audio, batch_size=settings.batch_size_for(device),
                                       language=language)
             detected = result.get("language") or language or "en"

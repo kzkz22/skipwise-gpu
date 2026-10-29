@@ -24,6 +24,8 @@ docker compose create --force-recreate whisper
 
 A kész átírási lépések (`/data`) és a modellek (`/models`) megmaradnak. Unraidon: `git pull` a forrásmappában, `docker build -t dwyt-whisper:local .../worker`, majd a sablonban **Apply**, ami újra létrehozza a konténert. Utána állítsd le.
 
+**2026. október vége (szakszavak):** a worker új `prompt` paramétert fogad (a dwyt-runner 0.22 küldi, ha beküldéskor szakszavakat adtál meg). Régi workerrel a futtató ugyanúgy működik, csak a szavak nem jutnak el a Whisperhez, ezért érdemes a fenti lépésekkel újraépíteni. A megőrzött átírási lépések szakszavak nélkül továbbra is érvényesek; szakszavakkal ugyanaz a hang újra átíródik.
+
 ## A llama-server
 
 ```bash

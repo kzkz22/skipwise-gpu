@@ -7,8 +7,8 @@ class _M:
         _fk.log("transcribe", s.dev, batch_size); time.sleep(float(os.environ.get("FAKE_SLEEP", "0")))
         if _fk.once("slow_once"): time.sleep(40)
         return {"language": language or "hu", "segments": [{"start": 0, "end": 30, "text": "raw"}]}
-def load_model(arch, device, compute_type=None, language=None, threads=4):
-    _fk.log("load_model", arch, device, compute_type); return _M(device)
+def load_model(arch, device, compute_type=None, language=None, threads=4, asr_options=None):
+    _fk.log("load_model", arch, device, compute_type, (asr_options or {}).get("initial_prompt")); return _M(device)
 def load_align_model(language_code, device): return object(), {}
 def align(segs, m, meta, audio, device, return_char_alignments=False):
     return {"segments": [{"start": np.float64(0.5), "end": np.float32(4.0), "text": "Jó napot.", "words": [{"word": "Jó", "start": np.float64(0.5)}]},
