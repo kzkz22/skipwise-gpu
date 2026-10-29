@@ -15,6 +15,10 @@ A konténereket az AI-router indítja. Frissítés előtt nézd meg, fut-e épp 
 
 ## A Whisper-worker
 
+A kész átírási lépések (`/data`) és a modellek (`/models`) mindkét úton megmaradnak.
+
+**A. Linux, compose-zal létrehozott konténer:**
+
 ```bash
 cd /opt/dwyt-gpu
 git pull
@@ -22,7 +26,15 @@ docker compose build whisper
 docker compose create --force-recreate whisper
 ```
 
-A kész átírási lépések (`/data`) és a modellek (`/models`) megmaradnak. Unraidon: `git pull` a forrásmappában, `docker build -t dwyt-whisper:local .../worker`, majd a sablonban **Apply**, ami újra létrehozza a konténert. Utána állítsd le.
+**B. Unraid, sablonból létrehozott konténer:** a `docker compose create` itt nem jó: a `dwyt-whisper` nevet a sablon konténere foglalja („Conflict. The container name "/dwyt-whisper" is already in use”). Csak a képet építsd újra, a konténert a sablon hozza létre:
+
+```bash
+cd /mnt/user/appdata/dwyt-gpu-src     # a forrásmappa
+git pull
+docker build -t dwyt-whisper:local worker
+```
+
+Utána a Docker fülön a `dwyt-whisper` → **Edit** → változtatás nélkül **Apply**: ez az új képpel hozza létre újra a konténert. Utána állítsd le (az AI-router indítja). Ha véletlenül lefutott a `docker compose create`, a félbemaradt, üres hálózatot és kötetet törölheted: `docker network rm dwyt-gpu_default; docker volume rm dwyt-gpu_whisper-data`.
 
 **2026. október vége (szakszavak):** a worker új `prompt` paramétert fogad (a dwyt-runner 0.22 küldi, ha beküldéskor szakszavakat adtál meg). Régi workerrel a futtató ugyanúgy működik, csak a szavak nem jutnak el a Whisperhez, ezért érdemes a fenti lépésekkel újraépíteni. A megőrzött átírási lépések szakszavak nélkül továbbra is érvényesek; szakszavakkal ugyanaz a hang újra átíródik.
 
