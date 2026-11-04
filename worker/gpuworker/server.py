@@ -8,7 +8,7 @@ GET  /health
 POST /transcribe?model=large-v3&language=hu&diarize=true&num_speakers=2[&prompt=Kovács Ödön, OKR.]
      body: the audio (16 kHz mono FLAC from the runner; any format ffmpeg reads works)
      answer: application/x-ndjson, one JSON object per line, sent as the job goes:
-        {"stage": "transcribe", "device": "cuda"}   progress, and every 10 s as a heartbeat
+        {"stage": "transcribe", "device": "cuda", "gpu": "RTX 3090"}   progress, and every 10 s as a heartbeat
         {"result": {...}}                            last line on success
         {"error": "..."}                             last line on failure
 

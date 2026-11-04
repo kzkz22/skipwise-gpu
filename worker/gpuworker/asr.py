@@ -61,6 +61,21 @@ def choose_device(settings: Settings, warnings: list[str]) -> str:
     return "cpu"
 
 
+def gpu_name() -> str | None:
+    """The card's name for the progress lines ("NVIDIA GeForce RTX 3090" -> "RTX 3090"); None without CUDA."""
+    try:
+        import torch
+        if not torch.cuda.is_available():
+            return None
+        name = str(torch.cuda.get_device_name(0))
+    except Exception:  # noqa: BLE001 - only a label
+        return None
+    for prefix in ("NVIDIA GeForce ", "NVIDIA ", "GeForce "):
+        if name.startswith(prefix):
+            name = name[len(prefix):]
+    return name[:60] or None
+
+
 def run(audio_path: str, opts: dict, settings: Settings, device: str, checkpoint: Path,
         stage: Callable[[str], None] = lambda s: None) -> dict:
     """Transcribe, align and (optionally) diarize on `device`; returns the raw result."""

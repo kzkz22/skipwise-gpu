@@ -6,7 +6,7 @@ diarization, NDJSON streaming with heartbeats, CUDA failure → CPU retry), mode
 model-download command driven by the airouter's `models.yaml`. Started and stopped on demand by dwyt-airouter;
 its ports must only be reachable from the AI router (no auth of its own).
 
-Status: round 2 implemented (worker port, compose file, `dwyt-gpu download|check`); plan 19c round A: query param `prompt` (≤1000 printable chars) → WhisperX `asr_options.initial_prompt`, part of the ASR checkpoint key when set. Not yet run on a real GPU host.
+Status: round 2 implemented (worker port, compose file, `dwyt-gpu download|check`); plan 19c round A: query param `prompt` (≤1000 printable chars) → WhisperX `asr_options.initial_prompt`, part of the ASR checkpoint key when set. Progress lines and the result carry `gpu` (the card's name, `asr.gpu_name`) while running on CUDA, for Skipwise's step list. Not yet run on a real GPU host.
 License: MIT.
 
 ## Layout

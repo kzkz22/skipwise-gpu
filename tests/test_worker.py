@@ -24,6 +24,7 @@ def test_job_streams_progress_and_a_diarized_result(worker):
     assert any(line.get("stage") for line in lines[:-1])
     result = lines[-1]["result"]
     assert result["device"] == "cuda" and result["diarized"] is True and result["language"] == "hu"
+    assert result["gpu"] == "RTX 3090" and any(line.get("gpu") == "RTX 3090" for line in lines[:-1])
     assert [s["speaker"] for s in result["segments"]] == ["SPEAKER_01", "SPEAKER_00"]
     assert isinstance(result["segments"][0]["start"], float)  # numpy scalars became JSON numbers
     assert "diarize cuda 2" in worker.calls()
@@ -34,7 +35,7 @@ def test_gpu_failure_finishes_on_cpu_with_a_warning(worker):
     worker.flag("gpu_fail_once")
     _, lines = transcribe(worker)
     result = lines[-1]["result"]
-    assert result["device"] == "cpu"
+    assert result["device"] == "cpu" and "gpu" not in result
     assert any("CPU-n fejeződött be" in w for w in result["warnings"])
 
 

@@ -41,6 +41,8 @@ def main(job_dir: Path) -> int:
         warnings: list[str] = []
         device = asr.choose_device(settings, warnings)
         state["device"] = device
+        if device == "cuda":  # shown on the item page: which card does the work (plan 19c, the step list)
+            state["gpu"] = asr.gpu_name()
         checkpoint = asr.checkpoint_path(settings, job["sha256"], opts["model"], opts.get("language"),
                                          opts.get("prompt"))
         audio = str(job_dir / "audio")
@@ -54,8 +56,11 @@ def main(job_dir: Path) -> int:
             log.warning("GPU run failed (%s: %s); retrying on CPU", type(exc).__name__, exc)
             warnings.append(f"A GPU-s futás hibát adott ({type(exc).__name__}); CPU-n fejeződött be.")
             state["device"] = "cpu"
+            state.pop("gpu", None)
             result = asr.run(audio, opts, settings, "cpu", checkpoint, stage)
         result["warnings"] = warnings + result["warnings"]
+        if state.get("gpu"):
+            result["gpu"] = state["gpu"]
         tmp = job_dir / "result.json.tmp"
         tmp.write_text(json.dumps(result, ensure_ascii=False, default=asr.json_default),
                        encoding="utf-8")
