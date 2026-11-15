@@ -19,6 +19,7 @@ jobs:
       - run: uv run --no-sync ruff check --select F,E,W --exclude tests/fakes dwyt_gpu worker tests
       - run: uv run --no-sync pytest -q
       - run: docker compose -f compose.yaml config --quiet   # the compose file stays valid
+      - run: docker compose -f compose.yaml -f compose.cpu.yaml config --quiet   # the CPU override too
   audit:
     runs-on: ubuntu-latest
     steps:

@@ -18,6 +18,7 @@ License: MIT.
 | `worker/gpuworker/asr.py` | WhisperX -> alignment -> diarization; ASR checkpoint keyed by audio SHA-256 + model + language (+ prompt) |
 | `worker/Dockerfile` | `whisperx==3.8.6` pinned (signatures verified against it in the old system) |
 | `compose.yaml` | `dwyt-llama` (llama.cpp server-cuda, router mode, `/models/models.ini`) and `dwyt-whisper`; create only |
+| `compose.cpu.yaml` | override: `dwyt-whisper` without the GPU reservation, `DEVICE=cpu` (AI router `whisper.device: cpu`, plan 19.39) |
 | `dwyt_gpu/download.py` | `downloads.json` (written by `dwyt-airouter generate`) -> `<dir>/gguf/<owner>/<repo>/` (version 2; version 1: flat `<dir>/gguf`), `<dir>/hf/hub`; space check; HF token from `HF_TOKEN` or `<dir>/hf/token` (0600, `dwyt-gpu token`) |
 | `dwyt_gpu/check.py` | Driver, Docker GPU access, containers, model folder |
 

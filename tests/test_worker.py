@@ -92,3 +92,13 @@ def test_a_caller_that_goes_away_stops_the_job_and_frees_the_gpu(worker):
     assert worker.health()["busy"] is False
     _, lines = transcribe(worker)
     assert "result" in lines[-1]
+
+
+def test_device_cpu_stays_on_the_cpu_even_with_a_visible_gpu(make_worker):
+    # whisper.device: cpu in the AI router: the worker runs next to an LLM that holds the GPU (plan 19.39)
+    worker = make_worker(DEVICE="cpu")
+    _, lines = transcribe(worker, "model=large-v3&language=hu&num_speakers=2")
+    result = lines[-1]["result"]
+    assert result["device"] == "cpu" and "gpu" not in result and result["warnings"] == []
+    assert not any(line.get("gpu") for line in lines[:-1])
+    assert "diarize cpu 2" in worker.calls()
