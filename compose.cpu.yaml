@@ -1,0 +1,8 @@
+# Whisper on the CPU (next to an LLM that holds the GPU, e.g. vLLM on all cards; AI router: whisper.device: cpu).
+#   docker compose -f compose.yaml -f compose.cpu.yaml create --force-recreate whisper
+# Needs Docker Compose 2.24 or newer (!reset).
+services:
+  whisper:
+    deploy: !reset {}
+    environment:
+      DEVICE: cpu

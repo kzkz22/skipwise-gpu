@@ -158,12 +158,23 @@ A `whisper.env`-ben (Unraidon változóként):
 | `ASR_CACHE_DAYS` | `14` | ennyi napig őrzi a beszélőfelismerés előtti átiratot (újrapróbáláskor onnan folytatja) |
 | `MAX_AUDIO_MB` | `2048` | a fogadott hang legnagyobb mérete |
 
+## Whisper a processzoron
+
+Ha a GPU-t állandóan egy nagy nyelvi modell foglalja (például vLLM mindkét kártyán), a Whisper-worker futhat a processzoron. Így nem kell miatta leállítani az LLM-et, és az LLM betöltése sem szakítja félbe az átírást. Cserébe lassabb: egy 16 magos processzoron a `large-v3-turbo` nagyjából a hang hosszának negyede–harmada alatt végez, a `large-v3` ennek 2–3-szorosa alatt, a beszélőfelismerés és az igazítás pedig még hozzájön. Ezek tájékoztató értékek, a saját gépeden mérd meg.
+
+1. **A konténer GPU nélkül, `DEVICE=cpu` változóval.**
+   - Unraidon a `dwyt-whisper` sablonjában: az Extra Parameters mezőből töröld a `--runtime=nvidia`-t, töröld a `NVIDIA_VISIBLE_DEVICES` változót, és vegyél fel egy `DEVICE=cpu` változót. Ha a processzoron más is fut (például a vLLM), a `CPU_THREADS` változóval hagyj neki néhány magot (16 magnál például `12`).
+   - Linuxon: `docker compose -f compose.yaml -f compose.cpu.yaml create --force-recreate whisper` (Docker Compose 2.24 vagy újabb kell hozzá).
+2. **Az AI-routerben** a `models.yaml` `whisper:` részébe `device: cpu` (skipwise-airouter 0.6-tól), majd `dwyt-airouter generate`.
+
+A worker eredményében ilyenkor `"device": "cpu"` áll, és a munka lépéseinél nem jelenik meg kártyanév.
+
 ## Hibakeresés
 
 | Jel | Ok és teendő |
 | --- | --- |
 | `dwyt-gpu check`: „Docker GPU-hozzáférés: nincs” | Az NVIDIA Container Toolkit hiányzik vagy nincs beállítva (`nvidia-ctk runtime configure --runtime=docker`, majd a Docker újraindítása). |
 | A Whisper-munka „Hugging Face-token kell” hibával áll le | `HF_TOKEN` a `whisper.env`-ben, és a pyannote-modell feltételei elfogadva; utána `docker compose create --force-recreate whisper`. |
-| A worker „CPU-n futott” figyelmeztetést ad | A konténer nem látja a GPU-t: Unraidon `--runtime=nvidia` és `NVIDIA_VISIBLE_DEVICES=all`, Linuxon a compose GPU-foglalása. |
+| A worker „CPU-n futott” figyelmeztetést ad | Ha szándékosan processzoron fut, `DEVICE=cpu` kell (akkor nincs figyelmeztetés). Különben a konténer nem látja a GPU-t: Unraidon `--runtime=nvidia` és `NVIDIA_VISIBLE_DEVICES=all`, Linuxon a compose GPU-foglalása. |
 | A llama-server nem indul: „models.ini” | A `models.ini` nincs a modellmappában, vagy régi; másold át újra a `generate` után. |
 | Elfogyott a VRAM | Egyszerre csak egy konténer fusson. Ha más GPU-s konténer is van a gépen, vedd fel az AI-router `other_gpu_containers` listájába. |
